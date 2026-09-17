@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Deploy Doctor - AI-powered deployment failure diagnosis.
+  Lambda function backed by Amazon Bedrock, exposed via API Gateway.
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.12
+    MemorySize: 256
+
+Resources:
+  DiagnoseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: deploy-doctor-diagnose
+      CodeUri: ../src/
+      Handler: lambda_handler.lambda_handler
+      Description: Diagnoses deployment failure logs using Amazon Bedrock
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource: '*'
+      Events:
+        DiagnoseApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref DeployDoctorApi
+            Path: /diagnose
+            Method: POST
+
+  DeployDoctorApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: '$default'
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - POST
+        AllowHeaders:
+          - Content-Type
+
+Outputs:
+  DeployDoctorApiUrl:
+    Description: Invoke URL for the Deploy Doctor diagnosis endpoint
+    Value: !Sub "https://${DeployDoctorApi}.execute-api.${AWS::Region}.amazonaws.com/diagnose"
+
+  DiagnoseFunctionArn:
+    Description: ARN of the diagnosis Lambda function
+    Value: !GetAtt DiagnoseFunction.Arn
