@@ -1,0 +1,30 @@
+[2026-09-15 09:44:11] Deploying container: notifications-worker:latest
+[2026-09-15 09:44:11] Starting container with port mapping 8080:8080
+[2026-09-15 09:44:12] > notifications-worker@1.4.0 start
+[2026-09-15 09:44:12] > node index.js
+[2026-09-15 09:44:12]
+[2026-09-15 09:44:12] Server starting...
+[2026-09-15 09:44:12] node:events:496
+[2026-09-15 09:44:12]       throw er; // Unhandled 'error' event
+[2026-09-15 09:44:12]       ^
+[2026-09-15 09:44:12]
+[2026-09-15 09:44:12] Error: listen EADDRINUSE: address already in use :::8080
+[2026-09-15 09:44:12]     at Server.setupListenHandle [as _listen2] (node:net:1740:16)
+[2026-09-15 09:44:12]     at listenInCluster (node:net:1788:12)
+[2026-09-15 09:44:12]     at Server.listen (node:net:1876:7)
+[2026-09-15 09:44:12]     at Object.<anonymous> (/app/index.js:22:8)
+[2026-09-15 09:44:12]     at Module._compile (node:internal/modules/cjs/loader:1256:14)
+[2026-09-15 09:44:12] Emitted 'error' event on Server instance at:
+[2026-09-15 09:44:12]     at emitErrorNT (node:net:1767:8)
+[2026-09-15 09:44:12]     at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+[2026-09-15 09:44:12]   code: 'EADDRINUSE',
+[2026-09-15 09:44:12]   errno: -98,
+[2026-09-15 09:44:12]   syscall: 'listen',
+[2026-09-15 09:44:12]   address: '::',
+[2026-09-15 09:44:12]   port: 8080
+[2026-09-15 09:44:12] }
+[2026-09-15 09:44:12]
+[2026-09-15 09:44:12] Node.js v18.19.0
+[2026-09-15 09:44:12] Container exited with code 1
+[2026-09-15 09:44:12] Note: another container 'metrics-collector' is already bound to host port 8080
+[2026-09-15 09:44:12] Deployment failed for service: notifications-worker

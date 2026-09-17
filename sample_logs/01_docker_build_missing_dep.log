@@ -1,0 +1,31 @@
+[2026-09-15 14:22:01] Starting build for service: user-api
+[2026-09-15 14:22:01] Pulling base image node:18-alpine...
+[2026-09-15 14:22:03] Step 1/8 : FROM node:18-alpine
+[2026-09-15 14:22:03]  ---> a3f8e2c91b45
+[2026-09-15 14:22:03] Step 2/8 : WORKDIR /app
+[2026-09-15 14:22:03]  ---> Using cache
+[2026-09-15 14:22:03]  ---> 9c1d4e8a2f31
+[2026-09-15 14:22:03] Step 3/8 : COPY package*.json ./
+[2026-09-15 14:22:04]  ---> 7b2a9f3e1c88
+[2026-09-15 14:22:04] Step 4/8 : RUN npm ci --production
+[2026-09-15 14:22:04]  ---> Running in 4d8f2a91b3c7
+[2026-09-15 14:22:06] npm ERR! code EUSAGE
+[2026-09-15 14:22:06] npm ERR! 
+[2026-09-15 14:22:06] npm ERR! The `npm ci` command can only install with an existing package-lock.json or
+[2026-09-15 14:22:06] npm ERR! npm-shrinkwrap.json with lockfileVersion >= 1. Run an install with npm@5 or
+[2026-09-15 14:22:06] npm ERR! later to generate a package-lock.json file, then try again.
+[2026-09-15 14:22:06] npm ERR! 
+[2026-09-15 14:22:06] npm ERR! Clean install a project
+[2026-09-15 14:22:06] npm ERR! 
+[2026-09-15 14:22:06] npm ERR! Usage:
+[2026-09-15 14:22:06] npm ERR! npm ci
+[2026-09-15 14:22:06] npm ERR! 
+[2026-09-15 14:22:06] npm ERR! Options:
+[2026-09-15 14:22:06] npm ERR! [--install-links]
+[2026-09-15 14:22:06] npm ERR! 
+[2026-09-15 14:22:06] npm ERR! aliases: clean-install, ic, install-clean, isntall-clean
+[2026-09-15 14:22:06] npm ERR! 
+[2026-09-15 14:22:06] npm ERR! Run "npm help ci" for more info
+[2026-09-15 14:22:06] The command '/bin/sh -c npm ci --production' returned a non-zero code: 1
+[2026-09-15 14:22:06] Build failed for service: user-api
+[2026-09-15 14:22:06] Exit code: 1

@@ -1,0 +1,22 @@
+[2026-09-15 11:02:45] Deploying new version: order-service:v4.1.0
+[2026-09-15 11:02:45] Rolling deployment strategy: rolling-update (max-surge=1, max-unavailable=0)
+[2026-09-15 11:02:46] Container order-service-7f9c8 started
+[2026-09-15 11:02:46] Application listening on port 3000
+[2026-09-15 11:02:51] Health check GET /health -> connecting to localhost:3000
+[2026-09-15 11:02:56] Health check GET /health -> timeout after 5000ms
+[2026-09-15 11:02:56] Health check attempt 1/5 failed
+[2026-09-15 11:03:01] Health check GET /health -> timeout after 5000ms
+[2026-09-15 11:03:01] Health check attempt 2/5 failed
+[2026-09-15 11:03:06] Health check GET /health -> timeout after 5000ms
+[2026-09-15 11:03:06] Health check attempt 3/5 failed
+[2026-09-15 11:03:11] Health check GET /health -> timeout after 5000ms
+[2026-09-15 11:03:11] Health check attempt 4/5 failed
+[2026-09-15 11:03:16] Health check GET /health -> timeout after 5000ms
+[2026-09-15 11:03:16] Health check attempt 5/5 failed
+[2026-09-15 11:03:16] Container order-service-7f9c8 failed readiness probe, aborting rollout
+[2026-09-15 11:03:16] Rollback initiated: reverting to order-service:v4.0.2
+[2026-09-15 11:03:17] Note: application logs show DB connection pool waiting indefinitely
+[2026-09-15 11:03:17]   [app] Attempting connection to postgres://db-internal:5432/orders...
+[2026-09-15 11:03:17]   [app] Connection attempt 1 timed out after 30000ms
+[2026-09-15 11:03:17]   [app] No /health route responds until DB connection succeeds
+[2026-09-15 11:03:17] Deployment failed for service: order-service

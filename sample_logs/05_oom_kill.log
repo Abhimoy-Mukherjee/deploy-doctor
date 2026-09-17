@@ -1,0 +1,24 @@
+[2026-09-15 16:33:02] Deploying container: image-processor:v1.9.0
+[2026-09-15 16:33:02] Resource limits: memory=256Mi, cpu=250m
+[2026-09-15 16:33:02] Container image-processor-4d9a2 started
+[2026-09-15 16:33:03] Worker ready, waiting for jobs on queue: image-resize
+[2026-09-15 16:33:41] Processing job: resize batch (48 images, avg 4200x3200px)
+[2026-09-15 16:33:52] Memory usage: 198Mi / 256Mi
+[2026-09-15 16:34:03] Memory usage: 241Mi / 256Mi
+[2026-09-15 16:34:07] Memory usage: 256Mi / 256Mi
+[2026-09-15 16:34:07] cgroup memory limit exceeded
+[2026-09-15 16:34:07] Container image-processor-4d9a2 killed (OOMKilled)
+[2026-09-15 16:34:07] Exit code: 137
+[2026-09-15 16:34:07] Restart policy: on-failure, attempt 1/3
+[2026-09-15 16:34:10] Container image-processor-4d9a2 started
+[2026-09-15 16:34:41] Processing job: resize batch (48 images, avg 4200x3200px)
+[2026-09-15 16:35:15] Memory usage: 256Mi / 256Mi
+[2026-09-15 16:35:15] Container image-processor-4d9a2 killed (OOMKilled)
+[2026-09-15 16:35:15] Exit code: 137
+[2026-09-15 16:35:15] Restart policy: on-failure, attempt 2/3
+[2026-09-15 16:35:18] Container image-processor-4d9a2 started
+[2026-09-15 16:35:49] Processing job: resize batch (48 images, avg 4200x3200px)
+[2026-09-15 16:36:23] Container image-processor-4d9a2 killed (OOMKilled)
+[2026-09-15 16:36:23] Restart policy: on-failure, attempt 3/3
+[2026-09-15 16:36:23] Container image-processor-4d9a2 marked as CrashLoopBackOff
+[2026-09-15 16:36:23] Deployment failed for service: image-processor

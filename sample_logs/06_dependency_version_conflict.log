@@ -1,0 +1,26 @@
+[2026-09-15 13:18:29] Starting build for service: analytics-api
+[2026-09-15 13:18:29] Pulling base image python:3.11-slim...
+[2026-09-15 13:18:31] Step 3/9 : COPY requirements.txt .
+[2026-09-15 13:18:31]  ---> Using cache
+[2026-09-15 13:18:31] Step 4/9 : RUN pip install -r requirements.txt
+[2026-09-15 13:18:31]  ---> Running in 9e2f4d81a3c5
+[2026-09-15 13:18:34] Collecting fastapi==0.115.0
+[2026-09-15 13:18:34]   Downloading fastapi-0.115.0-py3-none-any.whl (94 kB)
+[2026-09-15 13:18:35] Collecting pydantic==1.10.13
+[2026-09-15 13:18:35]   Downloading pydantic-1.10.13-cp311-cp311-manylinux_2_17_x86_64.whl (3.2 MB)
+[2026-09-15 13:18:37] Collecting starlette==0.38.6
+[2026-09-15 13:18:37]   Downloading starlette-0.38.6-py3-none-any.whl (71 kB)
+[2026-09-15 13:18:39] ERROR: Cannot install -r requirements.txt (line 2) and fastapi==0.115.0 because these package versions have conflicting dependencies.
+[2026-09-15 13:18:39]
+[2026-09-15 13:18:39] The conflict is caused by:
+[2026-09-15 13:18:39]     The user requested pydantic==1.10.13
+[2026-09-15 13:18:39]     fastapi 0.115.0 depends on pydantic!=1.8, !=1.8.1, !=2.0.0, !=2.0.1, !=2.1.0, <3.0.0 and >=1.7.4
+[2026-09-15 13:18:39]
+[2026-09-15 13:18:39] To fix this you could try to:
+[2026-09-15 13:18:39] 1. loosen the range of package versions you've specified
+[2026-09-15 13:18:39] 2. remove package versions to allow pip to attempt to solve the dependency conflict
+[2026-09-15 13:18:39]
+[2026-09-15 13:18:39] ERROR: ResolutionImpossible
+[2026-09-15 13:18:39] The command '/bin/sh -c pip install -r requirements.txt' returned a non-zero code: 1
+[2026-09-15 13:18:39] Build failed for service: analytics-api
+[2026-09-15 13:18:39] Exit code: 1
