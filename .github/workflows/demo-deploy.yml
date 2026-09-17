@@ -37,7 +37,7 @@ jobs:
           exit 1
 
       - name: Diagnose failure with Deploy Doctor
-        if: failure() && steps.deploy_step.outcome == 'failure'
+        if: steps.deploy_step.outcome == 'failure'
         run: |
           LOG_CONTENT=$(cat deploy_failure.log | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g')
 
@@ -74,5 +74,5 @@ jobs:
           echo "Diagnosis complete - see workflow summary."
 
       - name: Fail the workflow (deployment did not succeed)
-        if: failure() && steps.deploy_step.outcome == 'failure'
+        if: steps.deploy_step.outcome == 'failure'
         run: exit 1
