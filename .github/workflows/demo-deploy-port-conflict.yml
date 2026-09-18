@@ -1,0 +1,140 @@
+name: Demo Deploy Pipeline (Port Conflict)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: |
+          echo "Building application..." | tee -a build.log
+          echo "Build completed successfully." | tee -a build.log
+
+      - name: Deploy application
+        id: deploy_step
+        continue-on-error: true
+        run: |
+          {
+            echo "Deploying container: notifications-worker:latest"
+            echo "Starting container with port mapping 8080:8080"
+            echo "> notifications-worker start"
+            echo "> node index.js"
+            echo ""
+            echo "Error: listen EADDRINUSE: address already in use :::8080"
+            echo "    at Server.setupListenHandle [as _listen2] (node:net:1740:16)"
+            echo "    at Object.<anonymous> (/app/index.js:22:8)"
+            echo ""
+            echo "Container exited with code 1"
+            echo "Note: another container 'metrics-collector' is already bound to host port 8080"
+            echo "Deployment failed for service: notifications-worker"
+            exit 1
+          } 2>&1 | tee -a deploy_failure.log
+          exit 1
+
+      - name: Diagnose failure with Deploy Doctor
+        if: steps.deploy_step.outcome == 'failure'
+        run: |
+          LOG_CONTENT=$(cat deploy_failure.log | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g')
+
+          RESPONSE=$(curl -s -X POST "${{ vars.DEPLOY_DOCTOR_API_URL }}/diagnose" \
+            -H "Content-Type: application/json" \
+            -d "{\"log_content\": \"$LOG_CONTENT\"}")
+
+          echo "$RESPONSE" > diagnosis_response.json
+
+          echo "## 🩺 Deploy Doctor Diagnosis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          CATEGORY=$(echo "$RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin).get('category', 'unknown'))")
+          ROOT_CAUSE=$(echo "$RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin).get('root_cause', 'N/A'))")
+          EVIDENCE=$(echo "$RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin).get('evidence', 'N/A'))")
+          FIX=$(echo "$RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin).get('suggested_fix', 'N/A'))")
+          CONFIDENCE=$(echo "$RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin).get('confidence', 'unknown'))")
+
+          {
+            echo "**Category:** \`$CATEGORY\`"
+            echo ""
+            echo "**Confidence:** \`$CONFIDENCE\`"
+            echo ""
+            echo "### Root Cause"
+            echo "$ROOT_CAUSE"
+            echo ""
+            echo "### Evidence"
+            echo "\`\`\`"
+            echo "$EVIDENCE"
+            echo "\`\`\`"
+            echo ""
+            echo "### Suggested Fix"
+            echo "$FIX"
+          } >> $GITHUB_STEP_SUMMARY
+
+          echo "Diagnosis complete - see workflow summary."
+
+      - name: Auto-fix and open PR if high-confidence env var issue
+        if: steps.deploy_step.outcome == 'failure'
+        run: |
+          AUTO_FIX=$(python3 -c "import json; d = json.load(open('diagnosis_response.json')); print(json.dumps(d.get('auto_fix')))")
+
+          if [ "$AUTO_FIX" == "null" ] || [ -z "$AUTO_FIX" ]; then
+            echo "No auto-fixable issue detected (or confidence too low) - skipping PR creation."
+            exit 0
+          fi
+
+          ENV_VAR_NAME=$(echo "$AUTO_FIX" | python3 -c "import sys, json; print(json.load(sys.stdin)['env_var_name'])")
+          VALUE=$(echo "$AUTO_FIX" | python3 -c "import sys, json; print(json.load(sys.stdin)['value'])")
+          ACTION=$(echo "$AUTO_FIX" | python3 -c "import sys, json; print(json.load(sys.stdin)['action'])")
+
+          echo "Auto-fixable issue detected: $ACTION env var $ENV_VAR_NAME"
+
+          BRANCH_NAME="deploy-doctor/auto-fix-port-$(date +%s)"
+          git config user.name "Deploy Doctor Bot"
+          git config user.email "deploy-doctor-bot@users.noreply.github.com"
+          git checkout -b "$BRANCH_NAME"
+
+          if [ "$ACTION" == "update" ] && grep -q "^${ENV_VAR_NAME}=" demo-app/.env.example; then
+            sed -i.bak "s|^${ENV_VAR_NAME}=.*|${ENV_VAR_NAME}=${VALUE}|" demo-app/.env.example
+            rm -f demo-app/.env.example.bak
+            ACTION_DESC="updated"
+          else
+            echo "${ENV_VAR_NAME}=${VALUE}" >> demo-app/.env.example
+            ACTION_DESC="added"
+          fi
+
+          git add demo-app/.env.example
+          git commit -m "Deploy Doctor auto-fix: ${ACTION_DESC} ${ENV_VAR_NAME}
+
+          This fix was generated automatically by Deploy Doctor after detecting
+          a high-confidence environment variable issue.
+
+          Please review and confirm the value before merging."
+
+          git push origin "$BRANCH_NAME"
+
+          gh pr create \
+            --title "🩺 Deploy Doctor auto-fix: ${ACTION_DESC} ${ENV_VAR_NAME}" \
+            --body "**Automatically generated by Deploy Doctor**
+
+          This PR was opened automatically after Deploy Doctor diagnosed a deployment
+          failure with high confidence.
+
+          **Environment variable ${ACTION_DESC}:** \`${ENV_VAR_NAME}\`
+
+          ⚠️ The value set (\`${VALUE}\`) may be a placeholder - review it before merging.
+
+          This PR requires human review and will not be auto-merged." \
+            --base main \
+            --head "$BRANCH_NAME"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Fail the workflow (deployment did not succeed)
+        if: steps.deploy_step.outcome == 'failure'
+        run: exit 1
