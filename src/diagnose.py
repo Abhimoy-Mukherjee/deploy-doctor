@@ -16,6 +16,10 @@ health_check_failure, resource_limit, dependency_conflict, or other
 3. Propose a SPECIFIC, ACTIONABLE fix - not generic advice. If you can suggest an exact \
 config change, command, or code fix, do so.
 4. Rate your confidence (high/medium/low) in this diagnosis based on how clear the logs are.
+5. If (and ONLY if) the category is "missing_config" AND the fix is a single missing \
+environment variable AND your confidence is "high", also propose an auto-fix: the exact \
+environment variable name that should be added, and a placeholder value for it. If these \
+conditions aren't all met, set auto_fix to null.
 
 Respond ONLY in valid JSON with this exact structure, no other text:
 {
@@ -23,7 +27,8 @@ Respond ONLY in valid JSON with this exact structure, no other text:
   "root_cause": "<1-2 sentence plain-English explanation of WHY this happened>",
   "evidence": "<the specific log line(s) that point to this cause>",
   "suggested_fix": "<specific, actionable fix - include exact commands/config/code where possible>",
-  "confidence": "<high|medium|low>"
+  "confidence": "<high|medium|low>",
+  "auto_fix": {"env_var_name": "<NAME>", "placeholder_value": "<placeholder>"} or null
 }"""
 
 def diagnose_log(log_content: str, max_retries: int = 3) -> dict:
@@ -78,6 +83,7 @@ def diagnose_log(log_content: str, max_retries: int = 3) -> dict:
             "evidence": "",
             "suggested_fix": "",
             "confidence": "low",
+            "auto_fix": None,
             "_raw_response": raw_text,
         }
 
