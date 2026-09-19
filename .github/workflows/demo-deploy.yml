@@ -49,7 +49,7 @@ jobs:
 
           echo "## 🩺 Deploy Doctor Diagnosis" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "⏱️ **Diagnosed in ${ELAPSED} seconds** — manual investigation for this type of failure typically takes 10-15 minutes." >> $GITHUB_STEP_SUMMARY
+          echo " **Diagnosed in ${ELAPSED} seconds** — manual investigation for this type of failure typically takes 10-15 minutes." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           CATEGORY=$(echo "$RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin).get('category', 'unknown'))")
@@ -108,8 +108,7 @@ jobs:
           ${SUGGESTED_FIX}
 
           This requires human judgment - Deploy Doctor intentionally does not
-          guess at fixes it isn't confident are safe to apply automatically." \
-              --label "deploy-doctor"
+          guess at fixes it isn't confident are safe to apply automatically."
             exit 0
           fi
 
