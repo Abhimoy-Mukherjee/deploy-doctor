@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', 'Geist', 'IBM Plex Sans', system-ui, sans-serif;
+    background-color: #0B0D0F;
+    color: #E8EAED;
+  }
+  
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', 'IBM Plex Mono', 'Geist Mono', monospace;
+  }
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0D0F;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #252A2E;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3B424A;
+}
