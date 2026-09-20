@@ -1,4 +1,4 @@
-# Deploy Doctor 🩺
+# Deploy Doctor 
 
 **An AI agent that diagnoses failed deployments and, where it's safe to, fixes them automatically — via a real pull request.**
 
@@ -25,15 +25,16 @@ fails, it:
 4. **When the fix is a safe, single environment-variable change and confidence is
    high** — automatically opens a pull request with the fix applied. Every other
    case gets a diagnosis and suggestion, correctly withheld from auto-fixing.
+5. **For every other failure log a github isuue is generated which can be reviewed by a
+   human
 
 A standalone frontend also lets anyone paste a log and get the same diagnosis
 on demand, without needing a CI pipeline set up at all.
 
 ## Is This a New Idea?
 
-No, and we want to be upfront about that. Tools like CodeRabbit's pipeline
-remediation, TierZero, and various "self-healing CI" agents already exist in
-this space. We're not claiming to have invented AI-assisted failure diagnosis.
+No, Tools like CodeRabbit's pipeline remediation, TierZero, and various "self-healing CI" agents already exist in
+this space. But all of they are pay-per-use We're not claiming to have invented AI-assisted failure diagnosis.
 
 What we focused on instead:
 
@@ -43,11 +44,9 @@ What we focused on instead:
 - **An explicit, conservative automation policy**: Deploy Doctor only opens a
   PR when confidence is high AND the fix is a single, safe env var change.
   Every other diagnosis (build failures, dependency conflicts, resource limits,
-  ambiguous logs) is surfaced to a human, never guessed at. We think knowing
-  when *not* to automate is as important as the automation itself.
-- **Built end-to-end on Amazon Bedrock, Lambda, and API Gateway**, including
-  working through several real, undocumented rough edges of that stack (see
-  What We Learned below)
+  ambiguous logs) is surfaced to a human by a GitHub issue and never guessed at. We think knowing when *not* to automate is as important as the automation itself.
+- **Built end-to-end on Amazon Bedrock, Lambda, API Gateway and AWS Amplify**, including
+  working through several real, undocumented rough edges of that stack.
 
 ## Why This Isn't Just "Paste an Error Into an AI Chat"
 
@@ -88,6 +87,7 @@ diagnosis outside of any CI pipeline.
 - **AWS Lambda** — hosts the diagnosis logic
 - **API Gateway** — public HTTP endpoint (`POST /diagnose`)
 - **Amazon Bedrock** — foundation model inference (currently Amazon Nova Lite)
+- **AWS Amplify** — for deployment
 - **GitHub Actions** — automatic failure detection, diagnosis trigger, and
   auto-PR creation via the `gh` CLI
 - **[Planned, not built]** DynamoDB for cross-run failure pattern tracking
@@ -95,7 +95,7 @@ diagnosis outside of any CI pipeline.
 ## Live Demo
 
 - **API endpoint:** `https://x89gw8o4t3.execute-api.ap-south-1.amazonaws.com/diagnose`
-- **Frontend:** _link here once deployed_
+- **Frontend:** https://main.d15jp270cb0pij.amplifyapp.com/
 - **Demo video:** _link here once recorded_
 - **Example automated runs:** see the Actions tab of this repo —
   `Demo Deploy Pipeline` (env var fix) and
@@ -174,8 +174,8 @@ building a feature:
 ## Team
 
 - Abhimoy Mukherjee — AI/diagnosis logic, AWS infrastructure, GitHub Actions automation
-- [Teammate 1] — Lambda handler, deployment guide, SAM template
-- [Teammate 2] — Frontend
+- Vidya Kumari — Lambda handler, deployment guide, SAM template
+- Aayod Kurothe — Frontend
 
 ## Local Setup
 
