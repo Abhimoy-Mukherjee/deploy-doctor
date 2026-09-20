@@ -21,8 +21,12 @@ single environment variable change, also propose an auto-fix. This applies whene
 correct fix is either adding a new environment variable (e.g. a missing API key or config \
 value) or changing the value of an existing one (e.g. resolving a port conflict by picking \
 a different port). It does NOT apply to fixes that require code changes, dependency version \
-changes, infrastructure/resource changes, or anything that can't be expressed as one \
-environment variable name and value. If these conditions aren't met, set auto_fix to null.
+changes, or anything that can't be expressed as one environment variable name and value. \
+IMPORTANT: resource limits (memory, CPU) are platform/infrastructure configuration set in a \
+deployment manifest or compose file, NOT application environment variables - setting an env \
+var like MEMORY_LIMIT does not actually change a container's real resource ceiling in most \
+systems. Therefore auto_fix must ALWAYS be null for the resource_limit category, with no \
+exceptions, regardless of confidence. If these conditions aren't met, set auto_fix to null.
 
 Respond ONLY in valid JSON with this exact structure, no other text:
 {
@@ -35,6 +39,12 @@ Respond ONLY in valid JSON with this exact structure, no other text:
 }"""
 
 def _normalize_diagnosis(d: dict) -> dict:
+    """Defensive normalization: LLM-generated JSON can occasionally misspell
+    or vary a key name despite explicit schema instructions (e.g. 'suggestd_fix'
+    instead of 'suggested_fix'). This maps known variants back to the expected
+    keys and fills in safe defaults for anything still missing, so downstream
+    consumers (the GitHub Actions summary, the auto-PR step) never silently
+    break on a single bad generation."""
     key_aliases = {
         "suggestd_fix": "suggested_fix",
         "suggest_fix": "suggested_fix",
@@ -67,6 +77,8 @@ def _normalize_diagnosis(d: dict) -> dict:
         af.setdefault("value", "")
         if "env_var_name" not in af:
             d["auto_fix"] = None
+    if d.get("category") == "resource_limit":
+        d["auto_fix"] = None
 
     return d
 
@@ -82,7 +94,7 @@ def diagnose_log(log_content: str, max_retries: int = 3) -> dict:
                 "content": [{"text": f"Here is the deployment failure log:\n\n{log_content}"}],
             }
         ],
-        "inferenceConfig": {"maxTokens": 1000, "temperature": 0.3},
+        "inferenceConfig": {"maxTokens": 1000, "temperature": 0.1},
     }
 
     last_error = None
@@ -105,17 +117,24 @@ def diagnose_log(log_content: str, max_retries: int = 3) -> dict:
             raise
     else:
         raise last_error
+
     response_body = json.loads(response["body"].read())
     raw_text = response_body["output"]["message"]["content"][0]["text"]
+
     cleaned = raw_text.strip()
     if cleaned.startswith("```"):
-        cleaned = cleaned.split("```")[1]
-        if cleaned.startswith("json"):
-            cleaned = cleaned[4:]
+        first_newline = cleaned.find("\n")
+        if first_newline != -1:
+            cleaned = cleaned[first_newline + 1:]
+        if cleaned.rstrip().endswith("```"):
+            cleaned = cleaned.rstrip()[:-3]
     cleaned = cleaned.strip()
 
     try:
-        return _normalize_diagnosis(json.loads(cleaned))
+        parsed = json.loads(cleaned)
+        if isinstance(parsed.get("evidence"), list):
+            parsed["evidence"] = "\n".join(str(line) for line in parsed["evidence"])
+        return _normalize_diagnosis(parsed)
     except json.JSONDecodeError:
         return {
             "category": "other",
