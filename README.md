@@ -85,7 +85,6 @@ A separate, standalone frontend (built with React and Vite, hosted on AWS Amplif
 
 - API endpoint: `https://x89gw8o4t3.execute-api.ap-south-1.amazonaws.com/diagnose`
 - Frontend: `https://main.d15jp270cb0pij.amplifyapp.com/`
-- Demo video: _link here once recorded_
 - Example automated runs: see the Actions tab of this repo. `Demo Deploy Pipeline` shows the env-var fix path, and `Demo Deploy Pipeline (Port Conflict)` shows the port-value fix path, both including the resulting pull requests.
 
 ## How someone else would actually use this
